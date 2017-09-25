@@ -31,4 +31,9 @@ public class BookController {
 		bookService.delete(id);
 		return "删除成功";
 	}
+	
+	@RequestMapping("find")
+	public Object findById(Long id) {
+		return bookService.query(id);
+	}
 }

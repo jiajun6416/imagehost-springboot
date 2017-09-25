@@ -1,2 +1,2 @@
 #### 目前问题
-- 使用spring-boot-devtools启动时候会有空指针异常
+- 使用@ImportResource("classpath:transaction.xml")会抛出异常,虽然式debug

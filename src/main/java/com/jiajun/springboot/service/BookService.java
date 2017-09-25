@@ -19,4 +19,8 @@ public class BookService {
 	public void delete(Long id) {
 		bookDao.delete(id);
 	}
+	
+	public Book query(Long id) {
+		return bookDao.getOne(id);
+	}
 }
