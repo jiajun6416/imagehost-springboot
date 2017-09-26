@@ -18,12 +18,10 @@ import org.springframework.core.io.ResourceLoader;
 public class PropertiesLoader {
 
 	private static Logger logger = LoggerFactory.getLogger(PropertiesLoader.class);
-	
 	/**
 	 * 默认resourceLoader,会根据前缀自动加载不同类型的资源
 	 */
 	private static ResourceLoader resourceLoader = new DefaultResourceLoader();
-
 	private final Properties properties;
 
 	public PropertiesLoader(String... resourcesPaths) {
@@ -43,9 +41,9 @@ public class PropertiesLoader {
 			return systemProperty;
 		}
 		if (properties.containsKey(key)) {
-	        return properties.getProperty(key);
-	    }
-	    return "";
+			return properties.getProperty(key);
+		}
+		return "";
 	}
 
 	/**
@@ -129,9 +127,8 @@ public class PropertiesLoader {
 	 */
 	private Properties loadProperties(String... resourcesPaths) {
 		Properties props = new Properties();
-
 		for (String location : resourcesPaths) {
-//			logger.debug("Loading properties file from:" + location);
+			// logger.debug("Loading properties file from:" + location);
 			InputStream is = null;
 			try {
 				Resource resource = resourceLoader.getResource(location);

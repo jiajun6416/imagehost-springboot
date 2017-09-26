@@ -22,8 +22,8 @@ public class UserServiceImpl implements UserService{
 	
 	@Override
 	public UserEntity getByUsernameAndPw(String username, String password) throws Exception {
-		Assert.notNull(username);
-		Assert.notNull(password);
+		Assert.notNull(username, "username can not be null");
+		Assert.notNull(password, "password can not be null");
 		Map<String, String> params = new HashMap<>();
 		params.put("username", username);
 		params.put("password", password);

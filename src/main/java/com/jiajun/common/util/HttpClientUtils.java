@@ -42,33 +42,26 @@ public class HttpClientUtils {
 	private static final PoolingHttpClientConnectionManager HTTP_CLIENT_CONNECTION_MANAGER;
 	/** CloseableHttpClient */
 	private static final CloseableHttpClient HTTP_CLIENT;
-
 	static {
-		HTTP_CLIENT_CONNECTION_MANAGER = new PoolingHttpClientConnectionManager(
-				RegistryBuilder.<ConnectionSocketFactory>create()
-				.register("http", PlainConnectionSocketFactory.getSocketFactory())
-				.register("https", SSLConnectionSocketFactory.getSocketFactory())
-				.build());
+		HTTP_CLIENT_CONNECTION_MANAGER = new PoolingHttpClientConnectionManager(RegistryBuilder
+				.<ConnectionSocketFactory> create().register("http", PlainConnectionSocketFactory.getSocketFactory())
+				.register("https", SSLConnectionSocketFactory.getSocketFactory()).build());
 		HTTP_CLIENT_CONNECTION_MANAGER.setDefaultMaxPerRoute(100);
 		HTTP_CLIENT_CONNECTION_MANAGER.setMaxTotal(200);
-		RequestConfig requestConfig = RequestConfig.custom()
-				.setConnectionRequestTimeout(DEFAULT_TIME_OUT)
-				.setConnectTimeout(DEFAULT_TIME_OUT)
-				.setSocketTimeout(DEFAULT_TIME_OUT)
-				.build();
-		HTTP_CLIENT = HttpClientBuilder.create()
-				.setConnectionManager(HTTP_CLIENT_CONNECTION_MANAGER)
+		RequestConfig requestConfig = RequestConfig.custom().setConnectionRequestTimeout(DEFAULT_TIME_OUT)
+				.setConnectTimeout(DEFAULT_TIME_OUT).setSocketTimeout(DEFAULT_TIME_OUT).build();
+		HTTP_CLIENT = HttpClientBuilder.create().setConnectionManager(HTTP_CLIENT_CONNECTION_MANAGER)
 				.setDefaultRequestConfig(requestConfig).build();
 	}
+
 	/**
 	 * get
-	 * 
 	 * @param url
 	 * @param param
 	 * @return
 	 * @throws Exception
 	 */
-	public static String doGet(String url,Map<String, String> param) throws Exception {
+	public static String doGet(String url, Map<String, String> param) throws Exception {
 		String resultString = null;
 		CloseableHttpResponse response = null;
 		URIBuilder builder = new URIBuilder(url);
@@ -79,7 +72,6 @@ public class HttpClientUtils {
 		}
 		URI uri = builder.build();
 		HttpGet httpGet = new HttpGet(uri);
-		
 		try {
 			response = HTTP_CLIENT.execute(httpGet);
 			HttpEntity entity = response.getEntity();
@@ -89,7 +81,7 @@ public class HttpClientUtils {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			if(response != null) {
+			if (response != null) {
 				response.close();
 			}
 		}
@@ -111,16 +103,15 @@ public class HttpClientUtils {
 			UrlEncodedFormEntity entity = new UrlEncodedFormEntity(paramList);
 			httpPost.setEntity(entity);
 		}
-		
 		try {
 			response = HTTP_CLIENT.execute(httpPost);
-			if(response.getStatusLine().getStatusCode() == 200) {
+			if (response.getStatusLine().getStatusCode() == 200) {
 				resultString = EntityUtils.toString(response.getEntity(), "utf-8");
 			}
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			if(response != null) {
+			if (response != null) {
 				response.close();
 			}
 		}
@@ -129,7 +120,6 @@ public class HttpClientUtils {
 
 	/**
 	 * post
-	 * 
 	 * @param url
 	 * @param json格式
 	 * @return
@@ -142,22 +132,21 @@ public class HttpClientUtils {
 		HttpPost httpPost = new HttpPost(url);
 		StringEntity entity = new StringEntity(json, ContentType.APPLICATION_JSON);
 		httpPost.setEntity(entity);
-		
 		try {
 			response = HTTP_CLIENT.execute(httpPost);
-			if(response.getStatusLine().getStatusCode() == 200) {
+			if (response.getStatusLine().getStatusCode() == 200) {
 				resultString = EntityUtils.toString(response.getEntity(), "utf-8");
 			}
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			if(response != null) {
+			if (response != null) {
 				response.close();
 			}
 		}
 		return resultString;
 	}
-	
+
 	public static InputStream getImageStream(String url) throws Exception {
 		CloseableHttpResponse response = null;
 		HttpGet httpGet = new HttpGet(url);
@@ -173,16 +162,15 @@ public class HttpClientUtils {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * get
-	 * 
 	 * @param url
 	 * @param param
 	 * @return
 	 * @throws Exception
 	 */
-	public static InputStream getInPutStreamByGet(String url,Map<String, String> param) throws Exception {
+	public static InputStream getInPutStreamByGet(String url, Map<String, String> param) throws Exception {
 		CloseableHttpResponse response = null;
 		URIBuilder builder = new URIBuilder(url);
 		if (param != null) {
@@ -192,7 +180,6 @@ public class HttpClientUtils {
 		}
 		URI uri = builder.build();
 		HttpGet httpGet = new HttpGet(uri);
-		
 		try {
 			response = HTTP_CLIENT.execute(httpGet);
 			HttpEntity entity = response.getEntity();
@@ -202,21 +189,21 @@ public class HttpClientUtils {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			if(response != null) {
+			if (response != null) {
 				response.close();
 			}
 		}
 		return null;
 	}
-	
+
 	/**
-	 *  保存至本地
+	 * 保存至本地
 	 * @param url
 	 * @param param
 	 * @return
 	 * @throws Exception
 	 */
-	public static void saveToOutPutStream(String url,Map<String, String> param, OutputStream os) throws Exception {
+	public static void saveToOutPutStream(String url, Map<String, String> param, OutputStream os) throws Exception {
 		CloseableHttpResponse response = null;
 		URIBuilder builder = new URIBuilder(url);
 		if (param != null) {
@@ -226,7 +213,6 @@ public class HttpClientUtils {
 		}
 		URI uri = builder.build();
 		HttpGet httpGet = new HttpGet(uri);
-		
 		try {
 			response = HTTP_CLIENT.execute(httpGet);
 			HttpEntity entity = response.getEntity();
@@ -236,26 +222,23 @@ public class HttpClientUtils {
 		} catch (Exception e) {
 			throw e;
 		} finally {
-			if(response != null) {
+			if (response != null) {
 				response.close();
 			}
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		try {
-/*			InputStream is = getInPutStreamByGet("http://outofmemory.cn/static/book/java-concurrent-art.jpg", null);
-			BufferedInputStream bis = new BufferedInputStream(is);
-			FileOutputStream os = new FileOutputStream("d:/abc.png");
-			byte[] b = new byte[1024];
-			int len = -1;
-			while((len= bis.read(b)) != -1) {
-				os.write(b, 0, len);
-			}
-			bis.close();
-			os.close();*/
+			/*
+			 * InputStream is =
+			 * getInPutStreamByGet("http://outofmemory.cn/static/book/java-concurrent-art.jpg",
+			 * null); BufferedInputStream bis = new BufferedInputStream(is); FileOutputStream os =
+			 * new FileOutputStream("d:/abc.png"); byte[] b = new byte[1024]; int len = -1;
+			 * while((len= bis.read(b)) != -1) { os.write(b, 0, len); } bis.close(); os.close();
+			 */
 		} catch (Exception e) {
 			e.printStackTrace();
-		} 
+		}
 	}
 }

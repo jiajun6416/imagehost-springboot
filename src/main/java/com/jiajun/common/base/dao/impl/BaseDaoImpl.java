@@ -12,12 +12,12 @@ import com.jiajun.common.base.dao.BaseDao;
 import com.jiajun.common.bo.Page;
 
 @Repository
-@SuppressWarnings(value= {"unchecked","rawtypes"})
-public class BaseDaoImpl extends  SqlSessionDaoSupport implements BaseDao {
-	
+@SuppressWarnings(value = { "unchecked", "rawtypes" })
+public class BaseDaoImpl extends SqlSessionDaoSupport implements BaseDao {
+
 	private static final String DEFAULT_PAGE_COUNT_STATEMENT = "selectPageCount";
 	private static final String DEFAILT_PAGE_LIST_STATEMENT = "selectPageList";
-	
+
 	@Override
 	@Autowired
 	public void setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
@@ -26,14 +26,14 @@ public class BaseDaoImpl extends  SqlSessionDaoSupport implements BaseDao {
 
 	@Override
 	public int insert(String statement, Object obj) throws Exception {
-		 return this.getSqlSession().insert(statement, obj);
+		return this.getSqlSession().insert(statement, obj);
 	}
 
 	@Override
 	public int delete(String statement, Object obj) throws Exception {
 		return this.getSqlSession().delete(statement, obj);
 	}
-	
+
 	@Override
 	public int update(String statement, Object obj) throws Exception {
 		return this.getSqlSession().update(statement, obj);
@@ -42,7 +42,6 @@ public class BaseDaoImpl extends  SqlSessionDaoSupport implements BaseDao {
 	@Override
 	public List selectList(String statement, Object obj) throws Exception {
 		return this.getSqlSession().selectList(statement, obj);
-		
 	}
 
 	@Override
@@ -65,26 +64,24 @@ public class BaseDaoImpl extends  SqlSessionDaoSupport implements BaseDao {
 	}
 
 	@Override
-	public void batchDelete(String statement,  List list) throws Exception {
+	public void batchDelete(String statement, List list) throws Exception {
 		for (Object object : list) {
 			this.getSqlSession().delete(statement, object);
 		}
 	}
-
 
 	@Override
 	public void page(Page<?> page, String countStatement, String listStatement) throws Exception {
 		Map<String, Object> conditions = page.getConditions();
 		int count = (int) selectObject(countStatement, conditions);
 		page.setCount(count);
-		if(count > 0) {
+		if (count > 0) {
 			int pageSize = page.getPageSize();
-			int begin  = (page.getCurrentPage()-1)*pageSize;
+			int begin = (page.getCurrentPage() - 1) * pageSize;
 			conditions.put("begin", begin);
 			conditions.put("pageSize", pageSize);
-			
-			List list =  selectList(listStatement, conditions);
-			int totalPage = (count-1)/page.getPageSize() + 1;
+			List list = selectList(listStatement, conditions);
+			int totalPage = (count - 1) / page.getPageSize() + 1;
 			page.setTotalPage(totalPage);
 			page.setList(list);
 			conditions.remove("begin");

@@ -19,38 +19,39 @@ import com.jiajun.imagehosting.config.Constant;
 import com.jiajun.imagehosting.domain.UserEntity;
 import com.jiajun.imagehosting.service.UserService;
 
-public class LoginInterceptor implements HandlerInterceptor{
+public class LoginInterceptor implements HandlerInterceptor {
 
 	@Autowired
 	private UserService userService;
-	
+
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		HttpSession session = request.getSession();
 		UserEntity user = (UserEntity) session.getAttribute(Constant.SESSION_USER_KEY);
-		if(user == null) {
+		if (user == null) {
 			String username = null;
 			String password = null;
 			Cookie[] cookies = request.getCookies();
 			Map<String, String> cookieAlbumId = new HashMap<>();
 			for (Cookie cookie : cookies) {
-				if("username".equals(cookie.getName())) {
+				if ("username".equals(cookie.getName())) {
 					username = cookie.getValue();
 				}
-				if("password".equals(cookie.getName())) {
+				if ("password".equals(cookie.getName())) {
 					password = cookie.getValue();
 				}
-				if(cookie.getName().startsWith("selected_album_")) {
+				if (cookie.getName().startsWith("selected_album_")) {
 					cookieAlbumId.put(cookie.getName(), cookie.getValue());
 				}
 			}
-			if(StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password)) {
+			if (StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password)) {
 				user = userService.getByUsernameAndPw(username, password);
-				if(user != null) {
+				if (user != null) {
 					session.setAttribute(Constant.SESSION_USER_KEY, user);
-					if(StringUtils.isNotEmpty(cookieAlbumId.get("selected_album_"+user.getUsername()))) {
-						session.setAttribute(Constant.SESSION_ALBUM_SELECTED, Integer.valueOf(cookieAlbumId.get("selected_album_"+user.getUsername())));
+					if (StringUtils.isNotEmpty(cookieAlbumId.get("selected_album_" + user.getUsername()))) {
+						session.setAttribute(Constant.SESSION_ALBUM_SELECTED,
+								Integer.valueOf(cookieAlbumId.get("selected_album_" + user.getUsername())));
 					}
 				}
 				return true;
@@ -64,12 +65,12 @@ public class LoginInterceptor implements HandlerInterceptor{
 	private void toLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String method = request.getMethod();
 		String callback = HttpUtils.getBasePath(request);
-		if("get".equalsIgnoreCase(method)) {
-			//get请求添加路径
+		if ("get".equalsIgnoreCase(method)) {
+			// get请求添加路径
 			StringBuffer url = request.getRequestURL();
 			callback = url.toString();
 		}
-		response.sendRedirect(request.getContextPath()+"/login?callback="+callback);
+		response.sendRedirect(request.getContextPath() + "/login?callback=" + callback);
 	}
 
 	@Override
@@ -81,5 +82,4 @@ public class LoginInterceptor implements HandlerInterceptor{
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
 	}
-
 }

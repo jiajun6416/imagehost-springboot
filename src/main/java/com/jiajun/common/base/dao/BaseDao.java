@@ -11,14 +11,14 @@ import com.jiajun.common.bo.Page;
  */
 @SuppressWarnings("rawtypes")
 public interface BaseDao {
-	
+
 	/**
 	 * insert
 	 * @param statement 对应mapper的方法
 	 * @param obj
 	 */
 	int insert(String statement, Object obj) throws Exception;
-	
+
 	/**
 	 * delete
 	 * @param statement
@@ -27,7 +27,7 @@ public interface BaseDao {
 	 * @throws Exception
 	 */
 	int delete(String statement, Object obj) throws Exception;
-	
+
 	/**
 	 * update
 	 * @param statement
@@ -45,7 +45,7 @@ public interface BaseDao {
 	 * @throws Exception
 	 */
 	Object selectObject(String statement, Object obj) throws Exception;
-	
+
 	/**
 	 * 返回一个集合
 	 * @param statement
@@ -54,8 +54,7 @@ public interface BaseDao {
 	 * @throws Exception
 	 */
 	List selectList(String statement, Object obj) throws Exception;
-	
-	
+
 	/**
 	 * 分页查询
 	 * @param page
@@ -63,18 +62,17 @@ public interface BaseDao {
 	 * @param listStatement list sql
 	 * @throws Exception
 	 */
-	void page(Page<?> page, String countStatement,String listStatement) throws Exception;
-	
+	void page(Page<?> page, String countStatement, String listStatement) throws Exception;
+
 	/**
 	 * 使用默认的查询语句
 	 * @countStatement: selectPageCount
 	 * @listStatement: selectPageList
-	 * 
 	 * @param page
 	 * @throws Exception
 	 */
 	void page(Page<?> page) throws Exception;
-	
+
 	/**
 	 * 批量插入
 	 * @param strtrment
@@ -83,7 +81,7 @@ public interface BaseDao {
 	 * @throws Exception
 	 */
 	void batchInsert(String statement, List list) throws Exception;
-	
+
 	/**
 	 * 批量修改
 	 * @param statement
@@ -92,7 +90,7 @@ public interface BaseDao {
 	 * @throws Exception
 	 */
 	void batchUpdate(String statement, List list) throws Exception;
-	
+
 	/**
 	 * 批量删除
 	 * @param statement

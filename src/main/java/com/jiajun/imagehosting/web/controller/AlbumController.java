@@ -26,43 +26,42 @@ import com.jiajun.imagehosting.service.AlbumService;
 import com.jiajun.imagehosting.service.ImageService;
 
 @Controller
-public class AlbumController extends BaseController{
-	
+public class AlbumController extends BaseController {
+
 	@Autowired
 	private AlbumService albumService;
 	@Autowired
 	private ImageService imageService;
-	
-	
+
 	/**
 	 * 验证 此相册是否是用户下的
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	private boolean hasAlbum(int userId, int albumId) throws Exception {
-		//查询当前用户的所有相册
+		// 查询当前用户的所有相册
 		List<Integer> aIds = albumService.getHasAlbumIds(userId);
-		if(CollectionUtils.isNotEmpty(aIds) && aIds.contains(albumId)) {
+		if (CollectionUtils.isNotEmpty(aIds) && aIds.contains(albumId)) {
 			return true;
-		} 
+		}
 		return false;
 	}
-	
+
 	/**
 	 * 显示所有相册
 	 * @param session
 	 * @return
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	@RequestMapping("/album")
 	public String toAlbum(HttpSession session, Model model) throws Exception {
-		//查询所有相册
+		// 查询所有相册
 		UserEntity user = this.getLoginUser(session);
 		List<AlbumEntity> albumList = albumService.getHasAlbumsContainImage(user.getId());
 		model.addAttribute("albumList", albumList);
 		return "album/list";
 	}
-	
+
 	/**
 	 * 创建相册
 	 * @param name
@@ -72,19 +71,19 @@ public class AlbumController extends BaseController{
 	 */
 	@RequestMapping("createAblumn")
 	@ResponseBody
-	public Result createAblum(String name, int albumtype, HttpSession session) throws Exception{
+	public Result createAblum(String name, int albumtype, HttpSession session) throws Exception {
 		UserEntity user = this.getLoginUser(session);
-		//将名称进行html编码
+		// 将名称进行html编码
 		name = HtmlUtils.htmlEscape(name);
-		//查询是否有重名
+		// 查询是否有重名
 		AlbumEntity existAlbum = albumService.getByUserAndName(user.getId(), name);
-		if(existAlbum != null) {
+		if (existAlbum != null) {
 			return Result.fail("相册名称重复");
 		} else {
 			AlbumEntity albumEntity = new AlbumEntity();
 			albumEntity.setUserId(user.getId());
 			albumEntity.setName(name);
-			if(albumtype == 0) {
+			if (albumtype == 0) {
 				albumEntity.setIsPublic(false);
 			} else {
 				albumEntity.setIsPublic(true);
@@ -93,6 +92,7 @@ public class AlbumController extends BaseController{
 			return Result.success(null);
 		}
 	}
+
 	/**
 	 * 修改相册只能修改当前用户下的
 	 * @param albumId
@@ -104,31 +104,31 @@ public class AlbumController extends BaseController{
 	@ResponseBody
 	public Result albumPublicSet(int albumId, int type, HttpSession session) throws Exception {
 		UserEntity user = this.getLoginUser(session);
-		if(user == null) {
+		if (user == null) {
 			return Result.forbidden("not login");
 		}
-		if(this.hasAlbum(user.getId(), albumId)) {
-			albumService.updateAlbumAuthority(albumId, type); 
+		if (this.hasAlbum(user.getId(), albumId)) {
+			albumService.updateAlbumAuthority(albumId, type);
 			return Result.success(null);
 		} else {
 			return Result.error("非法操作!");
 		}
 	}
-	
+
 	@RequestMapping("album/delete")
 	@ResponseBody
 	public Result delete(int albumId, HttpSession session) throws Exception {
 		UserEntity user = this.getLoginUser(session);
-		//查询当前用户的所有相册
+		// 查询当前用户的所有相册
 		List<Integer> aIds = albumService.getHasAlbumIds(user.getId());
-		if(CollectionUtils.isNotEmpty(aIds) && aIds.contains(albumId)) {
-			//如果只有一个相册则不允许删除
-			if(aIds.size() == 1) {
+		if (CollectionUtils.isNotEmpty(aIds) && aIds.contains(albumId)) {
+			// 如果只有一个相册则不允许删除
+			if (aIds.size() == 1) {
 				return Result.fail("one");
 			}
-			//查询是否有图片
+			// 查询是否有图片
 			List<ImageEntity> imageList = imageService.getByAlbumId(albumId);
-			if(CollectionUtils.isNotEmpty(imageList)) {
+			if (CollectionUtils.isNotEmpty(imageList)) {
 				return Result.fail("hasImage");
 			}
 			albumService.delete(albumId);
@@ -137,64 +137,63 @@ public class AlbumController extends BaseController{
 			return Result.error("非法操作!");
 		}
 	}
-	
+
 	@RequestMapping("album/update")
 	@ResponseBody
-	public Result albumUpdate(int albumId, String name, int type, HttpSession session) throws Exception{
+	public Result albumUpdate(int albumId, String name, int type, HttpSession session) throws Exception {
 		UserEntity user = this.getLoginUser(session);
-		if(this.hasAlbum(user.getId(), albumId)) {
-			//输入转码
+		if (this.hasAlbum(user.getId(), albumId)) {
+			// 输入转码
 			name = HtmlUtils.htmlEscape(name);
-			//查询是否有重名
+			// 查询是否有重名
 			AlbumEntity album = albumService.getByUserAndName(user.getId(), name);
-			if(album != null && album.getIsPublic()==(type!=0)) {
+			if (album != null && album.getIsPublic() == (type != 0)) {
 				return Result.fail("exist");
 			}
 			album = new AlbumEntity();
 			album.setId(albumId);
 			album.setName(name);
-			album.setIsPublic(type!=0);
+			album.setIsPublic(type != 0);
 			albumService.update(album);
 			return Result.success(null);
 		} else {
 			return Result.error("非法操作!");
 		}
 	}
-	
+
 	@RequestMapping("album/updateNum")
 	@ResponseBody
 	public Result albumUpdateNum(int albumId, HttpSession session) throws Exception {
 		UserEntity user = this.getLoginUser(session);
-		if(hasAlbum(user.getId(), albumId)) {
+		if (hasAlbum(user.getId(), albumId)) {
 			int count = imageService.getCountByAlbumId(albumId);
 			return Result.success(count);
 		} else {
 			return Result.error("非法操作!");
-			
 		}
 	}
-	
+
 	@RequestMapping("album/selected")
 	@ResponseBody
-	public Result setSelectedAlbum(int albumId, HttpSession session, HttpServletResponse response) throws Exception{
+	public Result setSelectedAlbum(int albumId, HttpSession session, HttpServletResponse response) throws Exception {
 		UserEntity user = this.getLoginUser(session);
-		if(hasAlbum(user.getId(), albumId)) {
-			//将用户行为,选中的album存储在session中
+		if (hasAlbum(user.getId(), albumId)) {
+			// 将用户行为,选中的album存储在session中
 			session.setAttribute(Constant.SESSION_ALBUM_SELECTED, albumId);
 			return Result.success(null);
 		} else {
 			return Result.error("非法操作!");
-			
 		}
 	}
+
 	@RequestMapping("list/{albumId}")
-	public String imageList(@PathVariable("albumId") int albumId, HttpServletRequest request, 
-							Model model, HttpSession session) throws Exception {
+	public String imageList(@PathVariable("albumId") int albumId, HttpServletRequest request, Model model,
+			HttpSession session) throws Exception {
 		UserEntity user = this.getLoginUser(session);
-		if(hasAlbum(user.getId(), albumId)) {
+		if (hasAlbum(user.getId(), albumId)) {
 			AlbumEntity album = albumService.getById(albumId);
 			model.addAttribute("album", album);
-			//分页查询
+			// 分页查询
 			Page<ImageEntity> page = new Page<>(request);
 			page.addCondition("albumId", albumId);
 			imageService.getPage(page);
@@ -204,5 +203,4 @@ public class AlbumController extends BaseController{
 			throw new Exception("非法操作");
 		}
 	}
-
 }

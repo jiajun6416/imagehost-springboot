@@ -1,6 +1,5 @@
 package com.jiajun.imagehosting.web.controller;
 
-
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -36,51 +35,47 @@ import com.jiajun.imagehosting.util.AliyunOssHandler;
 import com.jiajun.imagehosting.util.FileUtils;
 
 @Controller
-public class ImageController extends BaseController{
-	
+public class ImageController extends BaseController {
+
 	@Autowired
 	private ImageService imageService;
 	@Autowired
 	private AlbumService albumService;
-	
 	@Autowired
 	private AliyunOssHandler ossHandler;
-	
+
 	@RequestMapping("upload/{type}")
-	public String toUploadLocal(@PathVariable("type")String type, 
-			HttpSession session, Model model) throws Exception{
+	public String toUploadLocal(@PathVariable("type") String type, HttpSession session, Model model) throws Exception {
 		UserEntity user = this.getLoginUser(session);
-		//查询具有的相册
+		// 查询具有的相册
 		List<AlbumEntity> albumList = albumService.getHasAlbumsWithImageNums(user.getId());
 		model.addAttribute("albumList", albumList);
-		return "upload/"+type;
+		return "upload/" + type;
 	}
-	
+
 	@RequestMapping("local/upload")
 	@ResponseBody
-	public Result doUpload(@RequestParam("file")MultipartFile file, HttpServletRequest request, HttpSession session) throws Exception {
+	public Result doUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request, HttpSession session)
+			throws Exception {
 		String contentType = file.getContentType();
-		if(!"image/png".equals(contentType) && !"image/jpg".equals(contentType) 
-				&& !"image/jpeg".equals(contentType) && !"image/gif".equals(contentType)) {
+		if (!"image/png".equals(contentType) && !"image/jpg".equals(contentType) && !"image/jpeg".equals(contentType)
+				&& !"image/gif".equals(contentType)) {
 			return Result.error("文件格式错误");
 		}
 		String filename = file.getOriginalFilename();
 		filename = HtmlUtils.htmlEscape(filename);
-		String fileType = filename.substring(filename.lastIndexOf(".")+1);
+		String fileType = filename.substring(filename.lastIndexOf(".") + 1);
 		BufferedImage image = ImageIO.read(file.getInputStream());
-		if(image == null) {
+		if (image == null) {
 			return Result.error("文件格式错误");
-		} 
+		}
 		int width = image.getWidth();
 		int height = image.getHeight();
 		long size = file.getSize();
-		
 		Integer albumId = this.getSelectedAlbum(session);
 		AlbumEntity album = albumService.getById(albumId);
-		
 		UserEntity user = this.getLoginUser(session);
-		String path = user.getUsername()+"/"+album.getName()+"/";
-		
+		String path = user.getUsername() + "/" + album.getName() + "/";
 		ImageEntity imageEntity = new ImageEntity();
 		imageEntity.setHeight(height);
 		imageEntity.setWidth(width);
@@ -90,121 +85,107 @@ public class ImageController extends BaseController{
 		imageEntity.setAlbumId(album.getId());
 		String uniqueName = FileUtils.generatorStoreName();
 		imageEntity.setUniqueName(uniqueName);
-
-		//上传到oss服务器
-		String httpUrl = ossHandler.uploadFile(path, uniqueName+"."+fileType, file.getInputStream());
-		
+		// 上传到oss服务器
+		String httpUrl = ossHandler.uploadFile(path, uniqueName + "." + fileType, file.getInputStream());
 		imageEntity.setHttpUrl(httpUrl);
-		
 		imageService.save(imageEntity);
-		
 		return Result.success(uniqueName);
 	}
-	
-	
+
 	@RequestMapping("network/upload")
 	@ResponseBody
-	public Result uploadNetworkImage(String fileurl, HttpSession session) throws Exception{
+	public Result uploadNetworkImage(String fileurl, HttpSession session) throws Exception {
 		// 判断是image路径
-		if(StringUtils.isImageUrl(fileurl)) {
-			BufferedImage imageBf = ImageIO.read( new URL(fileurl));
-			if(imageBf == null) {
+		if (StringUtils.isImageUrl(fileurl)) {
+			BufferedImage imageBf = ImageIO.read(new URL(fileurl));
+			if (imageBf == null) {
 				return Result.fail("上传非图片内容!");
 			}
-			String fileType = fileurl.substring(fileurl.lastIndexOf(".")+1);
+			String fileType = fileurl.substring(fileurl.lastIndexOf(".") + 1);
 			ImageEntity image = new ImageEntity();
-			
 			image.setFileType(fileType);
 			image.setHeight(imageBf.getHeight());
 			image.setWidth(imageBf.getHeight());
-
 			UserEntity user = this.getLoginUser(session);
 			String uniqueName = FileUtils.generatorStoreName();
 			Integer albumId = this.getSelectedAlbum(session);
-			String fileName = fileurl.substring(fileurl.lastIndexOf("/")+1, fileurl.length()-4);
+			String fileName = fileurl.substring(fileurl.lastIndexOf("/") + 1, fileurl.length() - 4);
 			fileName = HtmlUtils.htmlEscape(fileName);
-		    
 			image.setAlbumId(albumId);
 			image.setFileName(fileName);
 			image.setUniqueName(uniqueName);
-			
-			//BufferedImage 转 InputStream
-			ByteArrayOutputStream os = new ByteArrayOutputStream();  
-			ImageIO.write(imageBf, fileType, os);  
-			InputStream is = new ByteArrayInputStream(os.toByteArray());  
-
+			// BufferedImage 转 InputStream
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			ImageIO.write(imageBf, fileType, os);
+			InputStream is = new ByteArrayInputStream(os.toByteArray());
 			image.setSize((long) is.available());
-			
-			String path = user.getUsername()+"/"+albumService.getById(albumId).getName()+"/";
-			String httpUrl = ossHandler.uploadFile(path, uniqueName+"."+fileType, is);
+			String path = user.getUsername() + "/" + albumService.getById(albumId).getName() + "/";
+			String httpUrl = ossHandler.uploadFile(path, uniqueName + "." + fileType, is);
 			image.setHttpUrl(httpUrl);
 			imageService.save(image);
-			
 			return Result.success(uniqueName);
-			
 		} else {
 			return Result.fail("非图片资源链接");
 		}
 	}
-	
+
 	@RequestMapping("detail/{uniqueName}")
-	public String showImage(@PathVariable("uniqueName")String uniqueName, Model model, 
-			HttpServletRequest request, HttpSession session) throws Exception {
-		if(uniqueName.length() != 16) {
+	public String showImage(@PathVariable("uniqueName") String uniqueName, Model model, HttpServletRequest request,
+			HttpSession session) throws Exception {
+		if (uniqueName.length() != 16) {
 			throw new Exception("参数错误...");
 		}
 		ImageEntity imageEntity = imageService.getByUniqueName(uniqueName);
-		if(imageEntity == null) {
+		if (imageEntity == null) {
 			throw new Exception("所选图片不存在.");
 		}
 		AlbumEntity album = albumService.getById(imageEntity.getAlbumId());
 		model.addAttribute("image", imageEntity);
-		model.addAttribute("album",album);
+		model.addAttribute("album", album);
 		return "image/detail";
 	}
-	
+
 	@RequestMapping("update")
 	@ResponseBody
-	public Result imageUpdate(int pId, String pName, HttpSession session)throws Exception {
+	public Result imageUpdate(int pId, String pName, HttpSession session) throws Exception {
 		UserEntity user = this.getLoginUser(session);
-		if(user == null) {
+		if (user == null) {
 			return Result.forbidden("session expire ");
 		}
-		if(hasPicture(user.getId(), pId)) {
-			Assert.notNull(pName);
-			//将html标签转义
-			String  escape = HtmlUtils.htmlEscape(pName);
+		if (hasPicture(user.getId(), pId)) {
+			Assert.notNull(pName, "图片名称不能为空");
+			// 将html标签转义
+			String escape = HtmlUtils.htmlEscape(pName);
 			imageService.updateImageName(pId, escape);
 			return Result.success(escape);
 		} else {
 			return Result.error("非法操作");
 		}
 	}
-	
+
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result imageDelete(int pId, HttpSession session) throws Exception {
 		UserEntity user = this.getLoginUser(session);
-		if(user == null) {
+		if (user == null) {
 			return Result.forbidden("session expire ");
 		}
-		if(hasPicture(user.getId(), pId)) {
+		if (hasPicture(user.getId(), pId)) {
 			imageService.deleteImage(pId);
 			return Result.success(null);
 		} else {
 			return Result.error("非法操作");
 		}
 	}
-	
+
 	/**
 	 * 查询用户是否具有这张图片
 	 */
 	private boolean hasPicture(int userId, int pId) throws Exception {
 		List<Integer> ids = imageService.getIdsByUId(userId);
-		if(CollectionUtils.isNotEmpty(ids) && ids.contains(pId)) {
+		if (CollectionUtils.isNotEmpty(ids) && ids.contains(pId)) {
 			return true;
 		}
 		return false;
 	}
-	
 }
