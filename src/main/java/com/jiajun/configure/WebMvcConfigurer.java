@@ -1,11 +1,16 @@
 package com.jiajun.configure;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -20,10 +25,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
-import com.jiajun.imagehosting.web.interceptor.LoginInterceptor;
+import com.jiajun.common.bo.Result;
+import com.jiajun.common.util.JsonUtils;
+import com.jiajun.imagehosting.web.LoginInterceptor;
 
 @Configuration
 public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
+	
+	private static final Logger logger = LoggerFactory.getLogger(WebMvcConfigurer.class);
 
 	// 添加fastjson messageConverters
 	@Override
@@ -61,6 +70,12 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
 		registration.excludePathPatterns("/doLogin");
 	}
 
+	// 异常处理器
+	@Override
+	public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
+		exceptionResolvers.add(getGlobalExceptionResolver());
+	}
+	
 	@Bean
 	public HandlerExceptionResolver getGlobalExceptionResolver() {
 		return new HandlerExceptionResolver() {
@@ -72,17 +87,41 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
 					// 404
 					modelAndView.setViewName("404");
 				} else {
-					modelAndView.addObject("message", ex.getMessage());
-					modelAndView.setViewName("500");
+					if (logger.isErrorEnabled()) {
+						logger.error(ex.getMessage(), ex);
+					}
+					if (isAjaxRequest(request)) {
+						Result result = Result.error(ex.getMessage());
+						write(response, JsonUtils.toString(result));
+						return null;
+					} else {
+						modelAndView.setViewName("500");
+						modelAndView.addObject("message", ex.getMessage());
+					}
 				}
 				return modelAndView;
 			}
 		};
 	}
-
-	// 异常处理器
-	@Override
-	public void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
-		exceptionResolvers.add(getGlobalExceptionResolver());
+	
+	private boolean isAjaxRequest(HttpServletRequest request) {
+		boolean mine = request.getHeader("accept").contains("application/json");
+		String header = request.getHeader("X-Requested-With");
+		if (mine || StringUtils.isNoneEmpty(header) && header.contains("XMLHttpRequest")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
+	private void write(HttpServletResponse response, String msg) {
+		PrintWriter write;
+		try {
+			write = response.getWriter();
+			write.write(msg);
+			write.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

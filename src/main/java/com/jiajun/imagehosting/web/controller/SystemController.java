@@ -11,7 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.jiajun.common.base.controller.BaseController;
+import com.jiajun.common.base.BaseController;
 import com.jiajun.common.bo.Result;
 import com.jiajun.imagehosting.config.Constant;
 import com.jiajun.imagehosting.domain.UserEntity;

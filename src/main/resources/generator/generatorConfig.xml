@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+	<properties resource="application.properties" />
+	<!-- MyBatis3Simple -->
+	<context id="Mysql" targetRuntime="MyBatis3" defaultModelType="flat">
+		<!-- 对关键字加上单引号 -->
+		<property name="autoDelimitKeywords" value="true" />
+		<!-- 对数据库字段加上` -->
+		<property name="beginningDelimiter" value="`" />
+		<property name="endingDelimiter" value="`" />
+
+		<commentGenerator>
+			<property name="suppressDate" value="true" />
+			<property name="suppressAllComments" value="true" />
+		</commentGenerator>
+
+		<jdbcConnection driverClass="${datasource.driverClass}" connectionURL="${datasource.url}"
+			userId="${datasource.username}" password="${datasource.password}">
+		</jdbcConnection>
+
+		<javaModelGenerator targetPackage="com.company.project.model.entity"
+			targetProject="src/main/java" />
+
+		<sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources" />
+
+		<!-- <javaClientGenerator targetPackage="com.company.project.mapper" targetProject="src/main/java" 
+			type="XMLMAPPER" /> -->
+
+		<table tableName="sys_user" domainObjectName="User" enableSelectByExample="false"
+			enableDeleteByExample="false" enableCountByExample="false" enableUpdateByExample="false">
+			<generatedKey column="id" sqlStatement="Mysql" identity="true" />
+		</table>
+	</context>
+</generatorConfiguration>

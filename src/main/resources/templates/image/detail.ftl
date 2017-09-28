@@ -65,14 +65,8 @@
 		})
 
 	});
-	var aid = $
-	{
-		album.id
-	};
-	var pid = $
-	{
-		image.id
-	};
+	var aid = ${album.id};
+	var pid = ${image.id};
 </SCRIPT>
 </HEAD>
 <BODY>

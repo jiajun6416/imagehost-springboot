@@ -15,6 +15,7 @@
 				<SPAN class="user_nav_a" style="display:inline-block;">
 					<span style="color: black;font-weight: 600;">${session_user_key.nickname}</span>的个人相册&nbsp;&nbsp;</SPAN>
 				<span class="user_nav_b" id="create_a" >
+					<input type="button" value="回收站" onclick="window.location.href='${basePath}/recycle'" class="cbtn upload_c_a_c_b_a_b">
 					<input type="button" value="创建相册" onclick="createalbum()" class="cbtn upload_c_a_c_b_a_b">
 				</span>
 			</DIV>

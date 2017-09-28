@@ -19,8 +19,8 @@ public class MybatisConfiurer {
 	public SqlSessionFactory sqlTemplateFactory(DataSource dataSource) throws Exception {
 		SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
 		sessionFactoryBean.setMapperLocations(
-				new PathMatchingResourcePatternResolver().getResources("classpath:mybatis/**/*Mapper.xml"));
-		sessionFactoryBean.setConfigLocation(new ClassPathResource("mybatis/mybatis-config.xml"));
+				new PathMatchingResourcePatternResolver().getResources("classpath:mapper/**/*Mapper.xml"));
+		sessionFactoryBean.setConfigLocation(new ClassPathResource("mybatis-config.xml"));
 		sessionFactoryBean.setDataSource(dataSource);
 		return sessionFactoryBean.getObject();
 	}

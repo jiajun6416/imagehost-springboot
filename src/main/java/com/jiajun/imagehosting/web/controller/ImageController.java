@@ -23,7 +23,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.HtmlUtils;
 
-import com.jiajun.common.base.controller.BaseController;
+import com.jiajun.common.base.BaseController;
+import com.jiajun.common.bo.Page;
 import com.jiajun.common.bo.Result;
 import com.jiajun.common.util.StringUtils;
 import com.jiajun.imagehosting.domain.AlbumEntity;
@@ -188,4 +189,30 @@ public class ImageController extends BaseController {
 		}
 		return false;
 	}
+	
+	@RequestMapping("recycle")
+	public String getRecyleImage(HttpServletRequest request) throws Exception {
+		return "image/recycle";
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

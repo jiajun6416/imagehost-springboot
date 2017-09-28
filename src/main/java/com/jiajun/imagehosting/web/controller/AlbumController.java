@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.HtmlUtils;
 
-import com.jiajun.common.base.controller.BaseController;
+import com.jiajun.common.base.BaseController;
 import com.jiajun.common.bo.Page;
 import com.jiajun.common.bo.Result;
 import com.jiajun.imagehosting.config.Constant;
@@ -127,8 +127,8 @@ public class AlbumController extends BaseController {
 				return Result.fail("one");
 			}
 			// 查询是否有图片
-			List<ImageEntity> imageList = imageService.getByAlbumId(albumId);
-			if (CollectionUtils.isNotEmpty(imageList)) {
+			int hasNums = imageService.getCountByAlbumId(albumId);
+			if(hasNums > 0) {
 				return Result.fail("hasImage");
 			}
 			albumService.delete(albumId);

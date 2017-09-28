@@ -26,5 +26,11 @@ public interface ImageService {
 	void getPage(Page<ImageEntity> page) throws Exception;
 
 	List<Integer> getIdsByUId(int userId) throws Exception;
+	
+	/**
+	 * 获得已经删除图片的分页对象
+	 * @param page
+	 */
+	void getRecycleImage(Page<ImageEntity> page)throws Exception;
 
 }

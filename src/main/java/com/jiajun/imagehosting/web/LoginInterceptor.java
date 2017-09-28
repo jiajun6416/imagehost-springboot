@@ -1,4 +1,4 @@
-package com.jiajun.imagehosting.web.interceptor;
+package com.jiajun.imagehosting.web;
 
 import java.io.IOException;
 import java.util.HashMap;

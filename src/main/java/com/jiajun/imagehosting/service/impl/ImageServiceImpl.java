@@ -1,28 +1,21 @@
 package com.jiajun.imagehosting.service.impl;
 
-
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.jiajun.common.base.dao.BaseDao;
 import com.jiajun.common.bo.Page;
+import com.jiajun.imagehosting.dao.ImageDao;
 import com.jiajun.imagehosting.domain.ImageEntity;
 import com.jiajun.imagehosting.service.ImageService;
 
-@SuppressWarnings("unchecked")
 @Service
-public class ImageServiceImpl implements ImageService{
-	
-	
-	private static final String PICTURE_NAMESPACE = "imageEntityMapper.";
-	
+public class ImageServiceImpl implements ImageService {
+
 	@Autowired
-	private BaseDao dao;
+	private ImageDao imageDao;
 
 	@Override
 	public void save(ImageEntity imageEntity) throws Exception {
@@ -30,51 +23,51 @@ public class ImageServiceImpl implements ImageService{
 		imageEntity.setCreateTime(now);
 		imageEntity.setUpdateTime(now);
 		imageEntity.setIsDelete(false);
-		dao.insert(PICTURE_NAMESPACE+"insert", imageEntity);
+		imageDao.insert(imageEntity);
 	}
 
 	@Override
 	public ImageEntity getByUniqueName(String uniqueName) throws Exception {
-		return (ImageEntity) dao.selectObject(PICTURE_NAMESPACE+"selectByUnique", uniqueName);
+		return imageDao.selectByUnique(uniqueName);
 	}
 
 	@Override
 	public void updateImageName(Integer pId, String pName) throws Exception {
-		Map<String, Object> params = new HashMap<>();
-		params.put("id", pId);
-		params.put("pName", pName);
-		params.put("updateTime", new Date());
-		dao.update(PICTURE_NAMESPACE+"updateName", params);
+		ImageEntity imageEntity = new ImageEntity();
+		imageEntity.setId(pId);
+		imageEntity.setFileName(pName);
+		imageEntity.setUpdateTime(new Date());
+		imageDao.updateByPrimaryKeySelective(imageEntity);
 	}
 
 	@Override
 	public void deleteImage(Integer pId) throws Exception {
-		Map<String, Object> params = new HashMap<>();
-		params.put("id", pId);
+		ImageEntity imageEntity = new ImageEntity();
+		imageEntity.setId(pId);
 		Date now = new Date();
-		params.put("updateTime", now);
-		params.put("deleteTime", now);
-		dao.update(PICTURE_NAMESPACE+"updateStateToDelete", params);
+		imageEntity.setUpdateTime(now);
+		imageEntity.setDeleteTime(now);
+		imageEntity.setIsDelete(true);
+		imageDao.updateByPrimaryKeySelective(imageEntity);
 	}
 
 	@Override
 	public List<ImageEntity> getByAlbumId(Integer albumId) throws Exception {
-		return dao.selectList(PICTURE_NAMESPACE+"selectByAlbumId", albumId);
+		return imageDao.selectByAlbumId(albumId);
 	}
 
 	@Override
 	public int getCountByAlbumId(Integer albumId) throws Exception {
-		return (int) dao.selectObject(PICTURE_NAMESPACE+"selectCountByAlbumId", albumId);
+		return imageDao.selectCountByAlbumId(albumId);
 	}
 
 	@Override
-	public void getPage(Page<ImageEntity> page) throws Exception{
-		dao.page(page);
+	public void getPage(Page<ImageEntity> page) throws Exception {
+		imageDao.page(page);
 	}
 
 	@Override
 	public List<Integer> getIdsByUId(int userId) throws Exception {
-		return dao.selectList(PICTURE_NAMESPACE+"selectIdsByUserId", userId);
+		return imageDao.selectIdsByUserId(userId);
 	}
-	
 }
