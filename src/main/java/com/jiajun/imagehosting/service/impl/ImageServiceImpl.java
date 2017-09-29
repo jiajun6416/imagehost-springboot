@@ -70,4 +70,9 @@ public class ImageServiceImpl implements ImageService {
 	public List<Integer> getIdsByUId(int userId) throws Exception {
 		return imageDao.selectIdsByUserId(userId);
 	}
+
+	@Override
+	public void getRecycleImage(Page<ImageEntity> page) throws Exception {
+		
+	}
 }

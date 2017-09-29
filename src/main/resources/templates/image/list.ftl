@@ -39,7 +39,7 @@
 							</A>
 						</DIV>
 						<DIV class="c_p_l_c_i_b">
-							<A href="detail/${image.uniqueName}" target="_blank">${image.fileName}</A>
+							<A href="${basePath}/detail/${image.uniqueName}" target="_blank">${image.fileName}</A>
 						</DIV>
 						<DIV class="c_p_l_c_i_c"></DIV>
 						<DIV class="c_p_l_c_i_d">

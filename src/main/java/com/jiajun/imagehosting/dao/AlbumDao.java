@@ -11,7 +11,6 @@ import com.jiajun.common.base.BaseDao;
 import com.jiajun.imagehosting.domain.AlbumEntity;
 
 @Repository
-@SuppressWarnings("unchecked")
 public class AlbumDao extends BaseDao<AlbumEntity> {
 
 	@Override

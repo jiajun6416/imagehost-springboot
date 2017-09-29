@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.HtmlUtils;
 
 import com.jiajun.common.base.BaseController;
-import com.jiajun.common.bo.Page;
 import com.jiajun.common.bo.Result;
 import com.jiajun.common.util.StringUtils;
 import com.jiajun.imagehosting.domain.AlbumEntity;
